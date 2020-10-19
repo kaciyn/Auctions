@@ -1,0 +1,401 @@
+Item No,Description,Start Price
+1,Keyboard,14
+2,CPU,90
+3,Monitor,30
+4,Memory Module,30
+5,Memory Module,15
+6,CPU,75
+7,Monitor,30
+8,Memory Module,25
+9,Case,45
+10,Mouse,6
+11,SSD,55
+12,Keyboard,12
+13,Memory Module,15
+14,CPU,75
+15,Keyboard,11
+16,CPU,50
+17,Memory Module,30
+18,Case,50
+19,Motherboard,90
+20,Memory Module,30
+21,CPU,70
+22,Keyboard,9
+23,Case,40
+24,CPU,50
+25,Motherboard,130
+26,Keyboard,10
+27,Case,45
+28,Keyboard,10
+29,Mouse,2
+30,Keyboard,12
+31,Case,40
+32,SSD,55
+33,Motherboard,100
+34,Memory Module,15
+35,Mouse,5
+36,Monitor,30
+37,Monitor,30
+38,Case,55
+39,Case,50
+40,CPU,50
+41,SSD,55
+42,Mouse,6
+43,Case,25
+44,Memory Module,30
+45,Case,35
+46,SSD,55
+47,Mouse,2
+48,Case,40
+49,SSD,55
+50,SSD,55
+51,CPU,70
+52,Motherboard,130
+53,Memory Module,25
+54,Monitor,30
+55,Motherboard,150
+56,Monitor,30
+57,Mouse,5
+58,CPU,70
+59,Monitor,30
+60,SSD,60
+61,SSD,55
+62,CPU,70
+63,Monitor,30
+64,Monitor,30
+65,Keyboard,12
+66,Motherboard,130
+67,Keyboard,12
+68,Memory Module,30
+69,Monitor,30
+70,CPU,70
+71,Mouse,6
+72,Monitor,30
+73,CPU,90
+74,Case,50
+75,Case,45
+76,Memory Module,30
+77,Monitor,30
+78,Monitor,30
+79,Mouse,6
+80,CPU,70
+81,Mouse,6
+82,Motherboard,90
+83,CPU,50
+84,Motherboard,90
+85,SSD,60
+86,CPU,70
+87,Motherboard,100
+88,CPU,75
+89,SSD,80
+90,Case,50
+91,Keyboard,14
+92,Monitor,30
+93,Mouse,6
+94,Motherboard,90
+95,Memory Module,30
+96,Mouse,6
+97,Keyboard,14
+98,Memory Module,30
+99,Monitor,30
+100,Mouse,6
+101,Mouse,5
+102,Monitor,30
+103,SSD,60
+104,Monitor,30
+105,SSD,55
+106,Monitor,30
+107,Keyboard,14
+108,Keyboard,14
+109,Monitor,30
+110,Keyboard,12
+111,Motherboard,150
+112,Mouse,6
+113,Keyboard,12
+114,Memory Module,15
+115,Case,55
+116,SSD,55
+117,Case,40
+118,SSD,60
+119,SSD,55
+120,Memory Module,25
+121,Monitor,30
+122,Case,50
+123,Keyboard,10
+124,Keyboard,8
+125,Monitor,30
+126,Keyboard,12
+127,Mouse,6
+128,Mouse,6
+129,Case,45
+130,Motherboard,90
+131,CPU,75
+132,Motherboard,90
+133,Mouse,6
+134,Motherboard,90
+135,CPU,90
+136,Case,55
+137,Memory Module,20
+138,Monitor,30
+139,Memory Module,30
+140,Case,35
+141,Mouse,6
+142,SSD,55
+143,Memory Module,15
+144,Keyboard,11
+145,Monitor,30
+146,CPU,50
+147,Keyboard,12
+148,Mouse,6
+149,Monitor,30
+150,Case,50
+151,CPU,70
+152,Monitor,30
+153,SSD,80
+154,Keyboard,12
+155,Case,50
+156,CPU,70
+157,CPU,70
+158,Motherboard,90
+159,Mouse,6
+160,Motherboard,90
+161,CPU,70
+162,Keyboard,12
+163,Memory Module,15
+164,Case,50
+165,Monitor,30
+166,Mouse,5
+167,Motherboard,90
+168,Motherboard,90
+169,CPU,90
+170,Keyboard,14
+171,Keyboard,10
+172,Memory Module,15
+173,Motherboard,150
+174,Monitor,30
+175,Memory Module,30
+176,Memory Module,15
+177,Motherboard,130
+178,Mouse,2
+179,Motherboard,100
+180,Keyboard,10
+181,Keyboard,8
+182,CPU,70
+183,Memory Module,30
+184,Keyboard,12
+185,Motherboard,130
+186,Motherboard,100
+187,Case,45
+188,Case,25
+189,Mouse,6
+190,Memory Module,15
+191,Motherboard,90
+192,Keyboard,14
+193,Memory Module,20
+194,Case,55
+195,Case,45
+196,CPU,75
+197,Motherboard,90
+198,Keyboard,10
+199,Keyboard,12
+200,CPU,70
+201,Memory Module,15
+202,SSD,55
+203,Keyboard,10
+204,Monitor,30
+205,Memory Module,25
+206,Keyboard,12
+207,Memory Module,15
+208,Mouse,6
+209,Keyboard,12
+210,Mouse,6
+211,Motherboard,130
+212,Motherboard,130
+213,CPU,70
+214,Motherboard,90
+215,Keyboard,12
+216,Monitor,30
+217,SSD,60
+218,Case,45
+219,Keyboard,12
+220,Case,42
+221,Motherboard,130
+222,Keyboard,12
+223,Motherboard,100
+224,Mouse,6
+225,SSD,55
+226,Memory Module,25
+227,Case,50
+228,SSD,55
+229,Mouse,6
+230,CPU,75
+231,Motherboard,130
+232,Monitor,30
+233,Monitor,30
+234,Case,45
+235,Mouse,5
+236,SSD,80
+237,Case,55
+238,CPU,70
+239,Mouse,6
+240,Memory Module,15
+241,Keyboard,12
+242,Keyboard,12
+243,Mouse,5
+244,Mouse,6
+245,Memory Module,20
+246,Keyboard,12
+247,Mouse,2
+248,CPU,50
+249,Case,50
+250,Monitor,30
+251,Motherboard,150
+252,CPU,75
+253,Monitor,30
+254,Memory Module,20
+255,CPU,70
+256,SSD,80
+257,Mouse,5
+258,Mouse,6
+259,SSD,75
+260,Case,40
+261,CPU,50
+262,Memory Module,25
+263,Mouse,6
+264,Monitor,30
+265,Keyboard,12
+266,Motherboard,100
+267,CPU,75
+268,Memory Module,15
+269,Monitor,30
+270,Mouse,6
+271,Memory Module,20
+272,Monitor,30
+273,Motherboard,90
+274,Keyboard,10
+275,SSD,60
+276,SSD,80
+277,CPU,50
+278,Case,50
+279,Motherboard,100
+280,Mouse,6
+281,Monitor,30
+282,Mouse,6
+283,CPU,75
+284,Monitor,30
+285,CPU,90
+286,Memory Module,15
+287,SSD,80
+288,SSD,80
+289,Motherboard,90
+290,Mouse,6
+291,SSD,55
+292,Monitor,30
+293,Monitor,30
+294,Monitor,30
+295,Memory Module,15
+296,Mouse,6
+297,SSD,60
+298,Mouse,6
+299,Memory Module,15
+300,Memory Module,20
+301,SSD,80
+302,Memory Module,20
+303,Memory Module,30
+304,Case,50
+305,CPU,70
+306,Mouse,5
+307,Motherboard,130
+308,Motherboard,90
+309,Motherboard,90
+310,SSD,55
+311,Case,50
+312,CPU,90
+313,Case,55
+314,Motherboard,90
+315,CPU,75
+316,Memory Module,15
+317,Mouse,2
+318,Mouse,5
+319,Case,50
+320,Case,50
+321,Mouse,6
+322,Keyboard,8
+323,Memory Module,15
+324,Memory Module,15
+325,Motherboard,90
+326,SSD,75
+327,SSD,75
+328,CPU,75
+329,Keyboard,8
+330,CPU,50
+331,SSD,80
+332,Mouse,6
+333,Memory Module,20
+334,Case,50
+335,CPU,75
+336,Memory Module,30
+337,Keyboard,8
+338,Motherboard,130
+339,Motherboard,150
+340,Case,50
+341,Monitor,30
+342,Case,50
+343,Case,50
+344,CPU,70
+345,Case,45
+346,Motherboard,130
+347,Monitor,30
+348,SSD,55
+349,SSD,55
+350,Monitor,30
+351,CPU,75
+352,Memory Module,30
+353,SSD,80
+354,CPU,70
+355,Keyboard,14
+356,Monitor,30
+357,Monitor,30
+358,Monitor,30
+359,SSD,55
+360,CPU,75
+361,Motherboard,100
+362,Motherboard,100
+363,CPU,70
+364,SSD,55
+365,SSD,75
+366,Case,50
+367,Keyboard,14
+368,Memory Module,20
+369,Memory Module,15
+370,Motherboard,130
+371,SSD,55
+372,Case,30
+373,SSD,60
+374,Monitor,30
+375,SSD,80
+376,SSD,75
+377,Motherboard,150
+378,Memory Module,15
+379,Mouse,2
+380,Mouse,6
+381,Monitor,30
+382,Keyboard,9
+383,Case,50
+384,SSD,75
+385,Monitor,30
+386,Case,50
+387,Motherboard,90
+388,SSD,60
+389,Keyboard,8
+390,SSD,80
+391,Case,50
+392,Mouse,6
+393,Mouse,6
+394,Keyboard,14
+395,SSD,80
+396,Case,45
+397,Keyboard,10
+398,Motherboard,130
+399,CPU,70
+400,SSD,80
