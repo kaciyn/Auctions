@@ -8,16 +8,16 @@ public class Item
 
     String Description;
     Integer StartingPrice;
-
-    public String getDescription()
-    {
-        return Description;
-    }
-
-    public Integer getStartingPrice()
-    {
-        return StartingPrice;
-    }
+//
+//    public String getDescription()
+//    {
+//        return Description;
+//    }
+//
+//    public Integer getStartingPrice()
+//    {
+//        return StartingPrice;
+//    }
 
 
 }

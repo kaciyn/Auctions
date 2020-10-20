@@ -1,14 +1,9 @@
-import Agents.BidderAgent;
-import Agents.AuctioneerAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.core.Runtime;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Hashtable;
 
 
