@@ -12,6 +12,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.Hashtable;
+import java.util.Objects;
 
 public class BidderAgent extends Agent
 {
@@ -27,20 +28,19 @@ public class BidderAgent extends Agent
 //            BuyProduct
 //            End
 
-    Hashtable<String, Float> shoppingList;
-    private Hashtable catalogue;
+    Hashtable<String, Integer> shoppingList;
     private AID auctioneerAgent;
 
     protected void setup()
     {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
-            catalogue = (Hashtable) args[0];
-            System.out.println("Catalogue loaded");
+            shoppingList = (Hashtable) args[0];
+            System.out.println("Shopping list loaded");
         }
         else {
 // Make the agent terminate immediately
-            System.out.println("No catalogue found");
+            System.out.println("No Shopping list found");
             doDelete();
         }
 
@@ -68,57 +68,17 @@ public class BidderAgent extends Agent
 
                 // Register for auction
                 myAgent.addBehaviour(new AuctionRegistrationServer());
-
-                myAgent.addBehaviour(new AuctionRegistrationServer());
+                myAgent.addBehaviour(new AuctionBidPerformer());
+                myAgent.addBehaviour(new BidResultReceiver());
 
 
 // Make the agent terminate immediately
                 System.out.println("Auction concluded");
                 doDelete();
+
             }
-        }
-    }
-
-
-    private class ItemOfferReceiver extends Behaviour
-    {
-        private MessageTemplate mt; // The template to receive replies
-
-        @Override
-        public void action()
-        {
-            mt = MessageTemplate.and(MessageTemplate.MatchConversationId("book-trade"),
-                    MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
-            //TODO CONTINUE HERE
-            // Receive offers from auction
-            ACLMessage reply = myAgent.receive(mt);
-            if(reply !=null)
-
-            {
-                // Reply received
-                if (reply.getPerformative() == ACLMessage.PROPOSE) { // This is an offer
-                    int price = Integer.parseInt(reply.getContent());
-                    if (bestSeller == null || price < bestPrice) {
-                        // This is the best offer at present
-                        bestPrice = price;
-                        bestSeller = reply.getSender();
-                    }
-                }
-                repliesCnt++;
-                if (repliesCnt >= sellerAgents.length) {
-                    // We received all replies
-                }
-            }
-
-        }
-
-        @Override
-        public boolean done()
-        {
-            return false;
         });
     }
-
 
     //inform auctioneer agent it wishes to register
     private class AuctionRegistrationServer extends OneShotBehaviour
@@ -126,16 +86,75 @@ public class BidderAgent extends Agent
         @Override
         public void action()
         {
-            // Send the cfp to all sellers
             ACLMessage inform = new ACLMessage(ACLMessage.INFORM);
             inform.addReceiver(auctioneerAgent);
             //send bidder name to auctioneer to register
             inform.setContent(myAgent.getName());
-            inform.setConversationId("auction-register");
-            inform.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value myAgent.send(cfp);
+            inform.setConversationId("register-for-auction");
         }
+
     }
 
+
+    private class AuctionBidPerformer extends CyclicBehaviour
+    {
+        public void action()
+        {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+
+            ACLMessage msg = myAgent.receive(mt);
+
+            if (msg != null) {
+// Message received. Process it
+                String itemDetails = msg.getContent();
+
+                //TODO nothing to force format of message received which is not good or even check for whether the second bit is a number lol
+//for when the price is relevant later
+//                String itemDescription = itemDetails.split(",")[0];
+                String itemDescription = itemDetails;
+
+                ACLMessage reply = msg.createReply();
+
+                //if item is on shopping list, bid with requisite price
+                if (shoppingList.containsKey(itemDescription)) {
+//                    int itemPrice = Integer.parseInt(itemDetails.split(",")[1]);
+                    reply.setPerformative(ACLMessage.PROPOSE);
+                    reply.setContent(String.valueOf(shoppingList.get(itemDescription).intValue()));
+                }
+                else {
+                    reply.setPerformative(ACLMessage.REFUSE);
+
+                }
+                myAgent.send(reply);
+            }
+            else {
+                block();
+            }
+        }
+    }// End of inner class
+
+    private class BidResultReceiver extends CyclicBehaviour
+    {
+        public void action() {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+            ACLMessage msg = myAgent.receive(mt);
+            if (msg != null) {
+// INFORM Message received. Process it
+                String messageContent = msg.getContent();
+
+                if (messageContent.equals("Bid successful")) {
+                    System.out.println("Item bought by: " +myAgent.getLocalName());
+                }
+                else {
+                    System.out.println(myAgent.getLocalName()+"'s bid unsuccessful" );
+
+                }
+            }
+            else {
+                block();
+            }
+        }
+    } // End of inner class OfferRequestsServer
 
     // Put agent clean-up operations here
     protected void takeDown()
