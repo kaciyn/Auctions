@@ -13,20 +13,16 @@ public class Application
     public static void main(String[] args)
     {
 
-        var catalogue = new Hashtable<Integer, Item>();
 
-        var csvPath = "components.csv";
-
+        var catalogueCsvPath = "components.csv";
 
 
-        CsvParser.ParseCsv(csvPath, catalogue);
+        var catalogue = CsvParsers.ParseCatalogueCsv(catalogueCsvPath);
 
         //setup jade environment
         Profile myProfile = new ProfileImpl();
         Runtime myRuntime = Runtime.instance();
         ContainerController myContainer = myRuntime.createMainContainer(myProfile);
-
-
 
         try {
 
@@ -38,12 +34,14 @@ public class Application
             auctioneerAgent.start();
 
             for (int i = 0; i < 5; i++) {
-                AgentController bidderAgent = myContainer.createNewAgent("bidder"+ i, BidderAgent.class.getCanonicalName(), new Hashtable[]{catalogue});
+
+                var shoppingListCsvPath = "shoppingList" + i + ".csv";
+
+                var shoppingList = CsvParsers.ParseShoppingListCsv(shoppingListCsvPath);
+
+                AgentController bidderAgent = myContainer.createNewAgent("bidder" + i, BidderAgent.class.getCanonicalName(), new Hashtable[]{shoppingList});
                 bidderAgent.start();
             }
-
-
-
 
 
         } catch (Exception e) {
