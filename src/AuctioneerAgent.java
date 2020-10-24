@@ -182,12 +182,12 @@ public class AuctioneerAgent extends Agent
                     break;
                 case 2:
                     // Send confirmation to bidder
-                    ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-                    order.addReceiver(highestBidder);
-                    order.setContent(item.Description);
-                    order.setConversationId("bid-successful");
-                    order.setReplyWith("win" + System.currentTimeMillis());
-                    myAgent.send(order);
+                    ACLMessage bidConfirmation = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+                    bidConfirmation.addReceiver(highestBidder);
+                    bidConfirmation.setContent(item.Description+","+highestBid);
+                    bidConfirmation.setConversationId("bid-successful");
+                    bidConfirmation.setReplyWith("win" + System.currentTimeMillis());
+                    myAgent.send(bidConfirmation);
 
                     System.out.println(item.Description + " has been bought by: "+highestBidder+" for " + highestBid);
 

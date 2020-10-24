@@ -29,7 +29,7 @@ public class BidderAgent extends Agent
 //            End
 
     Hashtable<String, Integer> shoppingList;
-    HashSet<String> boughtItems;
+    Hashtable<String, Integer> boughtItems;
     private AID auctioneerAgent;
 
     protected void setup()
@@ -144,7 +144,9 @@ public class BidderAgent extends Agent
 
                 if (msg.getConversationId().equals("bid-successful")) {
                     System.out.println("Bidding won by: " + myAgent.getLocalName());
-                    boughtItems.add(msg.getContent());
+                    var itemDescription = msg.getContent().split(",")[0];
+                    var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
+                    boughtItems.put(itemDescription, itemPrice);
                 }
                 else {
                     System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");
@@ -159,7 +161,7 @@ public class BidderAgent extends Agent
     // Put agent clean-up operations here
     protected void takeDown()
     {
-        System.out.println("Bidder " + getAID().getName() + " purchased "+boughtItems.size()+ " items out of the"+shoppingList.size()+ " items they wanted.");
+        System.out.println("Bidder " + getAID().getName() + " purchased " + boughtItems.size() + " items out of the" + shoppingList.size() + " items they wanted.");
 
 // Printout a dismissal message
         System.out.println("Bidder " + getAID().getName() + "terminating.");
