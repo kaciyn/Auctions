@@ -185,9 +185,11 @@ public class AuctioneerAgent extends Agent
                     ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
                     order.addReceiver(highestBidder);
                     order.setContent(item.Description);
-                    order.setConversationId("bid-win");
+                    order.setConversationId("bid-successful");
                     order.setReplyWith("win" + System.currentTimeMillis());
                     myAgent.send(order);
+
+                    System.out.println(item.Description + " has been bought by: "+highestBidder+" for " + highestBid);
 
                     currentItemIndex++;
                     if (currentItemIndex > catalogue.size()) {

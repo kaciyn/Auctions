@@ -11,8 +11,8 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Objects;
 
 public class BidderAgent extends Agent
 {
@@ -29,6 +29,7 @@ public class BidderAgent extends Agent
 //            End
 
     Hashtable<String, Integer> shoppingList;
+    HashSet<String> boughtItems;
     private AID auctioneerAgent;
 
     protected void setup()
@@ -111,15 +112,14 @@ public class BidderAgent extends Agent
                 //TODO nothing to force format of message received which is not good or even check for whether the second bit is a number lol
 //for when the price is relevant later
 //                String itemDescription = itemDetails.split(",")[0];
-                String itemDescription = itemDetails;
 
                 ACLMessage reply = msg.createReply();
 
                 //if item is on shopping list, bid with requisite price
-                if (shoppingList.containsKey(itemDescription)) {
+                if (shoppingList.containsKey(itemDetails)) {
 //                    int itemPrice = Integer.parseInt(itemDetails.split(",")[1]);
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    reply.setContent(String.valueOf(shoppingList.get(itemDescription).intValue()));
+                    reply.setContent(String.valueOf(shoppingList.get(itemDetails).intValue()));
                 }
                 else {
                     reply.setPerformative(ACLMessage.REFUSE);
@@ -135,19 +135,19 @@ public class BidderAgent extends Agent
 
     private class BidResultReceiver extends CyclicBehaviour
     {
-        public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+        public void action()
+        {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
             ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
 // INFORM Message received. Process it
-                String messageContent = msg.getContent();
 
-                if (messageContent.equals("Bid successful")) {
-                    System.out.println("Item bought by: " +myAgent.getLocalName());
+                if (msg.getConversationId().equals("bid-successful")) {
+                    System.out.println("Bidding won by: " + myAgent.getLocalName());
+                    boughtItems.add(msg.getContent());
                 }
                 else {
-                    System.out.println(myAgent.getLocalName()+"'s bid unsuccessful" );
-
+                    System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");
                 }
             }
             else {
@@ -159,6 +159,8 @@ public class BidderAgent extends Agent
     // Put agent clean-up operations here
     protected void takeDown()
     {
+        System.out.println("Bidder " + getAID().getName() + " purchased "+boughtItems.size()+ " items out of the"+shoppingList.size()+ " items they wanted.");
+
 // Printout a dismissal message
         System.out.println("Bidder " + getAID().getName() + "terminating.");
     }
