@@ -119,46 +119,6 @@ public class AuctioneerAgent extends Agent
 
     }
 
-
-    private class AuctionItemServer extends CyclicBehaviour
-    {
-
-        public void action()
-        {
-            var item = catalogue.get(currentItemIndex);
-            System.out.println("Auctioning item: " + item.Description);
-
-        }
-
-        MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-        ACLMessage msg = myAgent.receive(mt);
-            if(msg !=null)
-
-        {
-// INFORM Message received. Process it
-            String title = msg.getContent();
-            ACLMessage reply = msg.createReply();
-
-            Integer price = (Integer) catalogue.remove(title);
-            if (price != null) {
-                reply.setPerformative(ACLMessage.INFORM);
-                System.out.println(title + " sold to agent " + msg.getSender().getName());
-            }
-            else {
-// The requested book has been sold to another buyer in the meanwhile .
-                reply.setPerformative(ACLMessage.FAILURE);
-                reply.setContent("not-available");
-            }
-            myAgent.send(reply);
-        }
-            else
-
-        {
-            block();
-        }
-    }
-
-
     private class AuctionServer extends Behaviour
     {
         private AID highestBidder; // The agent who provides the best offer
@@ -208,7 +168,7 @@ public class AuctioneerAgent extends Agent
                         if (responseCount >= bidderAgents.size()) {
                             // received all responses
                             if (highestBidder == null || highestBid < item.StartingPrice) {
-step=5;//nobody bid or price wasn't met
+                                step = 3;
                             }
                             else {
                                 step = 2;
@@ -224,37 +184,50 @@ step=5;//nobody bid or price wasn't met
                     // Send confirmation to bidder
                     ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
                     order.addReceiver(highestBidder);
-                    order.setContent(targetBookTitle);
-                    order.setConversationId("book-trade");
-                    order.setReplyWith("order" + System.currentTimeMillis());
+                    order.setContent(item.Description);
+                    order.setConversationId("bid-win");
+                    order.setReplyWith("win" + System.currentTimeMillis());
                     myAgent.send(order);
-                    // Prepare the template to get the purchase order reply
-                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId("book-trade"), MessageTemplate.MatchInReplyTo(order.getReplyWith()));
-                    step = 3;
-                    break;
-                case 3:
-                    // Receive the purchase order reply
-                    reply = myAgent.receive(mt);
-                    if (reply != null) {
-                        // Purchase order reply received
-                        if (reply.getPerformative() == ACLMessage.INFORM) {
-// Purchase successful. We can terminate System.out.println(targetBookTitle+" successfully purchased."); System.out.println("Price = "+bestPrice);
-                            myAgent.doDelete();
-                        }
+
+                    currentItemIndex++;
+                    if (currentItemIndex > catalogue.size()) {
                         step = 4;
+
                     }
                     else {
-                        block();
+                        step = 1;
+                    }
+
+                    break;
+                case 3:
+                    //unsold item
+                    System.out.println(item.Description + " has not been bid for, or has not met starting price. Auctioning next item");
+
+                    currentItemIndex++;
+                    if (currentItemIndex > catalogue.size()) {
+                        step = 4;
+
+                    }
+                    else {
+                        step = 1;
                     }
                     break;
+                case 4:
+                    //end auction
+                    System.out.println("All items bid for. Auction concluded");
+                    myAgent.doDelete();
+                    step = 5;
+                    break;
+
             }
+
         }
 
         public boolean done()
         {
-            return ((step == 2 && highestBidder == null) || step == 4);
+            return (step == 5);
         }
-    }  // End of inner class RequestPerformer
+    }
 
 
     protected void takeDown()
@@ -268,5 +241,6 @@ step=5;//nobody bid or price wasn't met
 
         System.out.println("Auctioneer " + getAID().getName() + " terminating.");
     }
+}
 
 
