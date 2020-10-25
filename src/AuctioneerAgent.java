@@ -41,13 +41,14 @@ public class AuctioneerAgent extends Agent
 
     protected void setup()
     {
+        bidderAgents = new HashSet<>();
 
         // Register the auctioneer in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
         sd.setType("auction");
-        sd.setName("Auction");
+        sd.setName("auction");
         dfd.addServices(sd);
         try {
             DFService.register(this, dfd);
@@ -72,7 +73,7 @@ public class AuctioneerAgent extends Agent
 
         addBehaviour(new AuctionRegistrationReceiver());
 
-        addBehaviour(new WakerBehaviour(this, 60000)
+        addBehaviour(new WakerBehaviour(this, 6000)
         {
             protected void handleElapsedTimeout()
             {
@@ -93,7 +94,7 @@ public class AuctioneerAgent extends Agent
             ACLMessage msg = myAgent.receive(mt);
 
 
-            if (msg != null && Objects.equals(msg.getConversationId(), "register-for-auction")) {
+            if (msg != null && msg.getConversationId().equals("register-for-auction")) {
 // INFORM Message received. Process it
 
                 AID newBidderAID = msg.getSender();
@@ -110,7 +111,7 @@ public class AuctioneerAgent extends Agent
 //                myAgent.send(reply);
             }
             else {
-                System.out.println("Unknown/null message received");
+//                System.out.println("Unknown/null message received");
                 block();
             }
 
@@ -121,9 +122,10 @@ public class AuctioneerAgent extends Agent
 
     private class AuctionServer extends Behaviour
     {
-        private AID highestBidder; // The agent who provides the best offer
-        private int highestBid; // The best offered price
-        private int responseCount = 0; // The counter of replies from seller agents private MessageTemplate mt; // The template to receive replies
+        private AID highestBidder = null; // The agent who provides the best offer
+        private int highestBid = 0; // The best offered price
+        int responseCount = 0; // The counter of replies from seller agents                    // Receive all bids/refusals from bidder
+
         private MessageTemplate mt; // The template to receive replies
         private int step = 0;
         Item item;
@@ -132,7 +134,6 @@ public class AuctioneerAgent extends Agent
         {
             switch (step) {
                 case 0:
-
                     item = catalogue.get(currentItemIndex);
                     System.out.println("Auctioning item: " + item.Description);
 
@@ -149,10 +150,13 @@ public class AuctioneerAgent extends Agent
 // Prepare the template to get proposals
                     mt = MessageTemplate.and(MessageTemplate.MatchConversationId("bid-on-item"),
                             MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
+
+                    myAgent.send(cfp);
+
                     step = 1;
                     break;
                 case 1:
-                    // Receive all bids/refusals from bidder
+                                       // The counter of replies from seller agents
                     ACLMessage reply = myAgent.receive(mt);
                     if (reply != null) {
                         // Reply received
@@ -163,6 +167,9 @@ public class AuctioneerAgent extends Agent
                                 highestBid = bid;
                                 highestBidder = reply.getSender();
                             }
+                        }
+                        else {
+                            reply.getPerformative();
                         }
                         responseCount++;
                         if (responseCount >= bidderAgents.size()) {
@@ -184,20 +191,25 @@ public class AuctioneerAgent extends Agent
                     // Send confirmation to bidder
                     ACLMessage bidConfirmation = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
                     bidConfirmation.addReceiver(highestBidder);
-                    bidConfirmation.setContent(item.Description+","+highestBid);
+                    bidConfirmation.setContent(item.Description + "," + highestBid);
                     bidConfirmation.setConversationId("bid-successful");
                     bidConfirmation.setReplyWith("win" + System.currentTimeMillis());
                     myAgent.send(bidConfirmation);
 
-                    System.out.println(item.Description + " has been bought by: "+highestBidder+" for " + highestBid);
+                    System.out.println(item.Description + " has been bought by: " + highestBidder + " for " + highestBid);
 
+                    //reset for next item
+                    responseCount=0;
+                    highestBidder = null; // The agent who provides the best offer
+                    highestBid = 0; // The best offered price
                     currentItemIndex++;
-                    if (currentItemIndex > catalogue.size()) {
+
+                    if (currentItemIndex >= catalogue.size()) {
                         step = 4;
 
                     }
                     else {
-                        step = 1;
+                        step = 0;
                     }
 
                     break;
@@ -205,18 +217,35 @@ public class AuctioneerAgent extends Agent
                     //unsold item
                     System.out.println(item.Description + " has not been bid for, or has not met starting price. Auctioning next item");
 
+                    //reset for next item
+                    responseCount=0;
+                    highestBidder = null; // The agent who provides the best offer
+                    highestBid = 0; // The best offered price
                     currentItemIndex++;
+
                     if (currentItemIndex > catalogue.size()) {
                         step = 4;
 
                     }
                     else {
-                        step = 1;
+                        step = 0;
                     }
                     break;
                 case 4:
                     //end auction
                     System.out.println("All items bid for. Auction concluded");
+
+                    // Send the cfp to all bidders
+                    ACLMessage endNotification = new ACLMessage(ACLMessage.INFORM);
+//iterate over bidder hashset
+                    for (AID bidder : bidderAgents) {
+                        endNotification.addReceiver(bidder);
+                    }
+
+                    endNotification.setConversationId("auction-concluded");
+                    myAgent.send(endNotification);
+
+
                     myAgent.doDelete();
                     step = 5;
                     break;

@@ -34,6 +34,8 @@ public class BidderAgent extends Agent
 
     protected void setup()
     {
+        boughtItems = new Hashtable<>();
+
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
             shoppingList = (Hashtable) args[0];
@@ -61,7 +63,9 @@ public class BidderAgent extends Agent
                 template.addServices(sd);
                 try {
                     DFAgentDescription[] result = DFService.search(myAgent, template);
-                    auctioneerAgent = result[0].getName();
+                    if (result.length>0){
+                        auctioneerAgent = result[0].getName();
+                    }
 
                 } catch (FIPAException fe) {
                     fe.printStackTrace();
@@ -69,13 +73,10 @@ public class BidderAgent extends Agent
 
                 // Register for auction
                 myAgent.addBehaviour(new AuctionRegistrationServer());
+
                 myAgent.addBehaviour(new AuctionBidPerformer());
                 myAgent.addBehaviour(new BidResultReceiver());
 
-
-// Make the agent terminate immediately
-                System.out.println("Auction concluded");
-                doDelete();
 
             }
         });
@@ -87,12 +88,16 @@ public class BidderAgent extends Agent
         @Override
         public void action()
         {
-            ACLMessage inform = new ACLMessage(ACLMessage.INFORM);
-            inform.addReceiver(auctioneerAgent);
+            ACLMessage registration = new ACLMessage(ACLMessage.INFORM);
+            registration.addReceiver(auctioneerAgent);
             //send bidder name to auctioneer to register
-            inform.setContent(myAgent.getName());
-            inform.setConversationId("register-for-auction");
+            registration.setContent(myAgent.getName());
+            registration.setConversationId("register-for-auction");
+
+            myAgent.send(registration);
+
         }
+
 
     }
 
@@ -107,19 +112,19 @@ public class BidderAgent extends Agent
 
             if (msg != null) {
 // Message received. Process it
-                String itemDetails = msg.getContent();
+                String itemDescription = msg.getContent();
 
                 //TODO nothing to force format of message received which is not good or even check for whether the second bit is a number lol
 //for when the price is relevant later
 //                String itemDescription = itemDetails.split(",")[0];
 
                 ACLMessage reply = msg.createReply();
-
+                reply.setConversationId("bid-on-item");
                 //if item is on shopping list, bid with requisite price
-                if (shoppingList.containsKey(itemDetails)) {
+                if (shoppingList.containsKey(itemDescription)) {
 //                    int itemPrice = Integer.parseInt(itemDetails.split(",")[1]);
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    reply.setContent(String.valueOf(shoppingList.get(itemDetails).intValue()));
+                    reply.setContent(String.valueOf(shoppingList.get(itemDescription)));
                 }
                 else {
                     reply.setPerformative(ACLMessage.REFUSE);
@@ -135,36 +140,47 @@ public class BidderAgent extends Agent
 
     private class BidResultReceiver extends CyclicBehaviour
     {
+        private int step = 0;
+
         public void action()
         {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            ACLMessage msg = myAgent.receive(mt);
-            if (msg != null) {
+            switch (step) {
+                case 0:
+
+                    MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    ACLMessage msg = myAgent.receive(mt);
+                    if (msg != null) {
 // INFORM Message received. Process it
 
-                if (msg.getConversationId().equals("bid-successful")) {
-                    System.out.println("Bidding won by: " + myAgent.getLocalName());
-                    var itemDescription = msg.getContent().split(",")[0];
-                    var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
-                    boughtItems.put(itemDescription, itemPrice);
-                }
-                else {
-                    System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");
-                }
-            }
-            else {
-                block();
-            }
-        }
-    } // End of inner class OfferRequestsServer
-
-    // Put agent clean-up operations here
-    protected void takeDown()
-    {
-        System.out.println("Bidder " + getAID().getName() + " purchased " + boughtItems.size() + " items out of the" + shoppingList.size() + " items they wanted.");
+                        if (msg.getConversationId().equals("auction-concluded")) {
+                            step = 1;
+                        }
+                        else if (msg.getConversationId().equals("bid-successful")) {
+                            System.out.println("Bidding won by: " + myAgent.getLocalName());
+                            var itemDescription = msg.getContent().split(",")[0];
+                            var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
+                            boughtItems.put(itemDescription, itemPrice);
+                        }
+                        else {
+                            System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");
+                        }
+                    }
+                    else {
+                        block();
+                    }
+                    break;
+                case 1: {
+                    System.out.println("Bidder " + getAID().getName() + " purchased " + boughtItems.size() + " items out of the" + shoppingList.size() + " items they wanted.");
 
 // Printout a dismissal message
-        System.out.println("Bidder " + getAID().getName() + "terminating.");
-    }
+                    System.out.println("Bidder " + getAID().getName() + "terminating.");
 
+                    // Make the agent terminate immediately
+                    doDelete();
+                    break;
+                }
+
+            }
+        }
+    }
 }
