@@ -159,7 +159,10 @@ public class BidderAgent extends Agent
                             System.out.println("Bidding won by: " + myAgent.getLocalName());
                             var itemDescription = msg.getContent().split(",")[0];
                             var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
+
+                            //add item to bought items, remove from shopping list
                             boughtItems.put(itemDescription, itemPrice);
+                            shoppingList.remove(itemDescription,itemPrice);
                         }
                         else {
                             System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");

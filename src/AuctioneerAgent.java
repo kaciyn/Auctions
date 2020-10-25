@@ -135,6 +135,8 @@ public class AuctioneerAgent extends Agent
             switch (step) {
                 case 0:
                     item = catalogue.get(currentItemIndex);
+                    System.out.println(currentItemIndex);
+
                     System.out.println("Auctioning item: " + item.Description);
 
                     // Send the cfp to all bidders
@@ -156,7 +158,7 @@ public class AuctioneerAgent extends Agent
                     step = 1;
                     break;
                 case 1:
-                                       // The counter of replies from seller agents
+                    // The counter of replies from seller agents
                     ACLMessage reply = myAgent.receive(mt);
                     if (reply != null) {
                         // Reply received
@@ -198,38 +200,14 @@ public class AuctioneerAgent extends Agent
 
                     System.out.println(item.Description + " has been bought by: " + highestBidder + " for " + highestBid);
 
-                    //reset for next item
-                    responseCount=0;
-                    highestBidder = null; // The agent who provides the best offer
-                    highestBid = 0; // The best offered price
-                    currentItemIndex++;
-
-                    if (currentItemIndex >= catalogue.size()) {
-                        step = 4;
-
-                    }
-                    else {
-                        step = 0;
-                    }
+                    incrementItem();
 
                     break;
                 case 3:
                     //unsold item
                     System.out.println(item.Description + " has not been bid for, or has not met starting price. Auctioning next item");
 
-                    //reset for next item
-                    responseCount=0;
-                    highestBidder = null; // The agent who provides the best offer
-                    highestBid = 0; // The best offered price
-                    currentItemIndex++;
-
-                    if (currentItemIndex > catalogue.size()) {
-                        step = 4;
-
-                    }
-                    else {
-                        step = 0;
-                    }
+                    incrementItem();
                     break;
                 case 4:
                     //end auction
@@ -250,6 +228,25 @@ public class AuctioneerAgent extends Agent
                     step = 5;
                     break;
 
+            }
+
+        }
+
+        //resets for next item, ends auction if at end of catalogue
+        void incrementItem()
+        {
+            //reset for next item
+            responseCount = 0;
+            highestBidder = null; // The agent who provides the best offer
+            highestBid = 0; // The best offered price
+            currentItemIndex++;
+
+            if (currentItemIndex >= catalogue.size()) {
+                step = 4;
+
+            }
+            else {
+                step = 0;
             }
 
         }
