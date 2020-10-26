@@ -11,7 +11,6 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.HashSet;
 import java.util.Hashtable;
 
 public class BidderAgent extends Agent
@@ -63,7 +62,7 @@ public class BidderAgent extends Agent
                 template.addServices(sd);
                 try {
                     DFAgentDescription[] result = DFService.search(myAgent, template);
-                    if (result.length>0){
+                    if (result.length > 0) {
                         auctioneerAgent = result[0].getName();
                     }
 
@@ -110,21 +109,34 @@ public class BidderAgent extends Agent
 
             ACLMessage msg = myAgent.receive(mt);
 
-            if (msg != null) {
-// Message received. Process it
-                String itemDescription = msg.getContent();
+            //incoming message needs to be format [description],[price(int)]
+            if (msg != null && msg.getContent().matches("^((^[a-zA-Z\\s]+),(\\d+))$")) {
 
-                //TODO nothing to force format of message received which is not good or even check for whether the second bit is a number lol
-//for when the price is relevant later
-//                String itemDescription = itemDetails.split(",")[0];
+// Message received. Process it
+                String itemDetails = msg.getContent();
+
+                String itemDescription = itemDetails.split(",")[0];
+
+
+                int currentItemPrice = Integer.parseInt(itemDetails.split(",")[1]);
 
                 ACLMessage reply = msg.createReply();
                 reply.setConversationId("bid-on-item");
-                //if item is on shopping list, bid with requisite price
-                if (shoppingList.containsKey(itemDescription)) {
-//                    int itemPrice = Integer.parseInt(itemDetails.split(",")[1]);
+
+
+                //if item is on shopping list, bid with slightly higher price up to own max
+                if (shoppingList.containsKey(itemDescription) && currentItemPrice < shoppingList.get(itemDescription)) {
+//                    var bidIncrement = 1; //maybe passing this in with the shopping list could be worthwhile someday but cba
+                    //                    var newBid = currentItemPrice + bidIncrement; //we're trying to get the lowest possible price right
+
+                    var newBid = (int) (Math.random() * (shoppingList.get(itemDescription) - currentItemPrice) + currentItemPrice); //so the spec says "somewhere between current and max price so maybe I will actually make this random to make things a bit more spicey
+
+                    System.out.println(myAgent.getLocalName() + " bids " + newBid);
+
+
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    reply.setContent(String.valueOf(shoppingList.get(itemDescription)));
+                    reply.setContent(String.valueOf(newBid));
+
                 }
                 else {
                     reply.setPerformative(ACLMessage.REFUSE);
@@ -162,7 +174,8 @@ public class BidderAgent extends Agent
 
                             //add item to bought items, remove from shopping list
                             boughtItems.put(itemDescription, itemPrice);
-                            shoppingList.remove(itemDescription,itemPrice);
+                            //only will work if you don't have multiples of the same kind of item in shopping list, could make this work with duplicates but, again, cba
+                            shoppingList.remove(itemDescription);
                         }
                         else {
                             System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");

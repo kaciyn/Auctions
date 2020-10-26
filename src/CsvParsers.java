@@ -17,7 +17,8 @@ public class CsvParsers
             while ((row = csvReader.readLine()) != null) {
 
                 String[] data = row.split(",");
-                catalogue.put(Integer.parseInt(data[0]) - 1, new Item(data[1], Integer.parseInt(data[2])));
+                //sets current price as starting price initially
+                catalogue.put(Integer.parseInt(data[0]) - 1, new Item(data[1], Integer.parseInt(data[2]), Integer.parseInt(data[2])));
             }
 
             csvReader.close();

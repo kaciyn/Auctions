@@ -1,23 +1,13 @@
 public class Item
 {
-    public Item(String description, int startingPrice)
+    public Item(String description, int startingPrice,int currentPrice)
     {
         Description = description;
         StartingPrice = startingPrice;
+        CurrentPrice=currentPrice;
     }
 
     String Description;
     Integer StartingPrice;
-//
-//    public String getDescription()
-//    {
-//        return Description;
-//    }
-//
-//    public Integer getStartingPrice()
-//    {
-//        return StartingPrice;
-//    }
-
-
+    Integer CurrentPrice;
 }
