@@ -30,6 +30,16 @@ public class BidderAgent extends Agent
     ArrayList<Item> boughtItems;
     private AID auctioneerAgent;
 
+    int cpus = 0;
+    int keyboards = 0;
+    int cases = 0;
+    int memoryModules = 0;
+    int monitors = 0;
+    int motherboards = 0;
+    int mice = 0;
+    int ssds = 0;
+    ArrayList<Integer> componentAmounts;
+
     protected void setup()
     {
         boughtItems = new ArrayList<>();
@@ -72,6 +82,17 @@ public class BidderAgent extends Agent
                 // Register for auction
                 myAgent.addBehaviour(new AuctionRegistrationServer());
 
+                componentAmounts = new ArrayList<>();
+                componentAmounts.add(cpus);
+                componentAmounts.add(cases);
+                componentAmounts.add(keyboards);
+                componentAmounts.add(memoryModules);
+                componentAmounts.add(monitors);
+                componentAmounts.add(motherboards);
+                componentAmounts.add(mice);
+                componentAmounts.add(ssds);
+
+
                 myAgent.addBehaviour(new AuctionBidPerformer());
                 myAgent.addBehaviour(new BidResultReceiver());
 
@@ -96,7 +117,6 @@ public class BidderAgent extends Agent
 
         }
 
-
     }
 
 
@@ -104,6 +124,8 @@ public class BidderAgent extends Agent
     {
         public void action()
         {
+
+
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 
             ACLMessage msg = myAgent.receive(mt);
@@ -124,7 +146,8 @@ public class BidderAgent extends Agent
 
 
                 //if item is on shopping list, bid with slightly higher price up to own max
-                if (shoppingList.containsKey(itemDescription) && currentItemPrice < shoppingList.get(itemDescription)) {
+                if (shoppingList.containsKey(itemDescription) && currentItemPrice < shoppingList.get(itemDescription) && Collections.min(componentAmounts); //TODO UGH I ACTUALLY CAN'T BE BOTHERED ANYMORE
+) {
                     var bidIncrement = (int) (Math.random() * (5 - 1) + 1); //maybe passing this in with the shopping list could be worthwhile someday but cba
                     var newBid = currentItemPrice + bidIncrement; //we're trying to get the lowest possible price right
 
@@ -182,61 +205,15 @@ public class BidderAgent extends Agent
 //                    System.out.println("Bidder " + getAID().getName() + " purchased " + boughtItems.size() + " items out of the" + shoppingList.size() + " items they wanted.");
 
 
-                    var cpus = 0;
-                    var keyboards = 0;
-                    var cases = 0;
-                    var memoryModules = 0;
-                    var monitors = 0;
-                    var motherboards = 0;
-                    var mice = 0;
-                    var ssds = 0;
-
                     var totalSpent = 0;
                     for (Item item : boughtItems) {
 //                        System.out.println(myAgent.getLocalName()+" bought "+item.Description);
-
-                        switch (item.Description) {
-                            case "CPU":
-                                cpus++;
-                                break;
-                            case "Keyboard":
-                                keyboards++;
-                                break;
-                            case "Case":
-                                cases++;
-                                break;
-                            case "Memory Module":
-                                memoryModules++;
-                                break;
-                            case "Monitor":
-                                monitors++;
-                                break;
-                            case "Motherboard":
-                                motherboards++;
-                                break;
-                            case "Mouse":
-                                mice++;
-                                break;
-                            case "SSD":
-                                ssds++;
-                                break;
-                        }
-
 
                         totalSpent = totalSpent + item.CurrentPrice;
                     }
 
 //                    var builtComputers = new HashSet<Computer>();
 
-                    var componentAmounts = new ArrayList<Integer>();
-                    componentAmounts.add(cpus);
-                    componentAmounts.add(cases);
-                    componentAmounts.add(keyboards);
-                    componentAmounts.add(memoryModules);
-                    componentAmounts.add(monitors);
-                    componentAmounts.add(motherboards);
-                    componentAmounts.add(mice);
-                    componentAmounts.add(ssds);
 
                     var builtComputers = Collections.min(componentAmounts);
                     //HGHGRHHGRH WHY DO I HAVE TO MAKE EVERYTHING SO COMPLICATED
@@ -343,6 +320,33 @@ public class BidderAgent extends Agent
             System.out.println("Bidding won by: " + myAgent.getLocalName());
             var itemDescription = msg.getContent().split(",")[0];
             var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
+
+            switch (itemDescription) {
+                case "CPU":
+                    cpus++;
+                    break;
+                case "Keyboard":
+                    keyboards++;
+                    break;
+                case "Case":
+                    cases++;
+                    break;
+                case "Memory Module":
+                    memoryModules++;
+                    break;
+                case "Monitor":
+                    monitors++;
+                    break;
+                case "Motherboard":
+                    motherboards++;
+                    break;
+                case "Mouse":
+                    mice++;
+                    break;
+                case "SSD":
+                    ssds++;
+                    break;
+            }
 
             //add item to bought items, cba fucking about w the extra starting price
             boughtItems.add(new Item(itemDescription, itemPrice, itemPrice));
