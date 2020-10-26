@@ -1,6 +1,5 @@
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -11,7 +10,7 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.Hashtable;
+import java.util.*;
 
 public class BidderAgent extends Agent
 {
@@ -28,16 +27,16 @@ public class BidderAgent extends Agent
 //            End
 
     Hashtable<String, Integer> shoppingList;
-    Hashtable<String, Integer> boughtItems;
+    ArrayList<Item> boughtItems;
     private AID auctioneerAgent;
 
     protected void setup()
     {
-        boughtItems = new Hashtable<>();
+        boughtItems = new ArrayList<>();
 
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
-            shoppingList = (Hashtable) args[0];
+            shoppingList = (Hashtable<String, Integer>) args[0];
             System.out.println("Shopping list loaded");
         }
         else {
@@ -126,10 +125,10 @@ public class BidderAgent extends Agent
 
                 //if item is on shopping list, bid with slightly higher price up to own max
                 if (shoppingList.containsKey(itemDescription) && currentItemPrice < shoppingList.get(itemDescription)) {
-//                    var bidIncrement = 1; //maybe passing this in with the shopping list could be worthwhile someday but cba
-                    //                    var newBid = currentItemPrice + bidIncrement; //we're trying to get the lowest possible price right
+                    var bidIncrement = (int) (Math.random() * (5 - 1) + 1); //maybe passing this in with the shopping list could be worthwhile someday but cba
+                    var newBid = currentItemPrice + bidIncrement; //we're trying to get the lowest possible price right
 
-                    var newBid = (int) (Math.random() * (shoppingList.get(itemDescription) - currentItemPrice) + currentItemPrice); //so the spec says "somewhere between current and max price so maybe I will actually make this random to make things a bit more spicey
+//                    var newBid = (int) (Math.random() * (shoppingList.get(itemDescription) - currentItemPrice) + currentItemPrice); //so the spec says "somewhere between current and max price so maybe I will actually make this random to make things a bit more spicey
 
                     System.out.println(myAgent.getLocalName() + " bids " + newBid);
 
@@ -159,7 +158,8 @@ public class BidderAgent extends Agent
             switch (step) {
                 case 0:
 
-                    MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL),
+                            MessageTemplate.MatchPerformative(ACLMessage.INFORM));
                     ACLMessage msg = myAgent.receive(mt);
                     if (msg != null) {
 // INFORM Message received. Process it
@@ -168,14 +168,7 @@ public class BidderAgent extends Agent
                             step = 1;
                         }
                         else if (msg.getConversationId().equals("bid-successful")) {
-                            System.out.println("Bidding won by: " + myAgent.getLocalName());
-                            var itemDescription = msg.getContent().split(",")[0];
-                            var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
-
-                            //add item to bought items, remove from shopping list
-                            boughtItems.put(itemDescription, itemPrice);
-                            //only will work if you don't have multiples of the same kind of item in shopping list, could make this work with duplicates but, again, cba
-                            shoppingList.remove(itemDescription);
+                            recordWinningBid(msg);
                         }
                         else {
                             System.out.println(myAgent.getLocalName() + "'s bid unsuccessful");
@@ -186,10 +179,156 @@ public class BidderAgent extends Agent
                     }
                     break;
                 case 1: {
-                    System.out.println("Bidder " + getAID().getName() + " purchased " + boughtItems.size() + " items out of the" + shoppingList.size() + " items they wanted.");
+//                    System.out.println("Bidder " + getAID().getName() + " purchased " + boughtItems.size() + " items out of the" + shoppingList.size() + " items they wanted.");
+
+
+                    var cpus = 0;
+                    var keyboards = 0;
+                    var cases = 0;
+                    var memoryModules = 0;
+                    var monitors = 0;
+                    var motherboards = 0;
+                    var mice = 0;
+                    var ssds = 0;
+
+                    var totalSpent = 0;
+                    for (Item item : boughtItems) {
+//                        System.out.println(myAgent.getLocalName()+" bought "+item.Description);
+
+                        switch (item.Description) {
+                            case "CPU":
+                                cpus++;
+                                break;
+                            case "Keyboard":
+                                keyboards++;
+                                break;
+                            case "Case":
+                                cases++;
+                                break;
+                            case "Memory Module":
+                                memoryModules++;
+                                break;
+                            case "Monitor":
+                                monitors++;
+                                break;
+                            case "Motherboard":
+                                motherboards++;
+                                break;
+                            case "Mouse":
+                                mice++;
+                                break;
+                            case "SSD":
+                                ssds++;
+                                break;
+                        }
+
+
+                        totalSpent = totalSpent + item.CurrentPrice;
+                    }
+
+//                    var builtComputers = new HashSet<Computer>();
+
+                    var componentAmounts = new ArrayList<Integer>();
+                    componentAmounts.add(cpus);
+                    componentAmounts.add(cases);
+                    componentAmounts.add(keyboards);
+                    componentAmounts.add(memoryModules);
+                    componentAmounts.add(monitors);
+                    componentAmounts.add(motherboards);
+                    componentAmounts.add(mice);
+                    componentAmounts.add(ssds);
+
+                    var builtComputers = Collections.min(componentAmounts);
+                    //HGHGRHHGRH WHY DO I HAVE TO MAKE EVERYTHING SO COMPLICATED
+//                    while (true) { //this feels like a bad way to do this but like....... i'm not paid to be novel
+//
+//                        Item CPU = boughtItems.stream()
+//                                .filter(component -> "CPU".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//
+//                        if (CPU == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(CPU);
+//
+//                        Item Keyboard = boughtItems.stream()
+//                                .filter(component -> "Keyboard".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (Keyboard == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(Keyboard);
+//
+//                        Item Case = boughtItems.stream()
+//                                .filter(component -> "Keyboard".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (Case == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(Case);
+//
+//                        Item MemoryModule = boughtItems.stream()
+//                                .filter(component -> "Memory Module".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (MemoryModule == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(MemoryModule);
+//
+//                        Item Monitor = boughtItems.stream()
+//                                .filter(component -> "Monitor".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (Monitor == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(Monitor);
+//
+//                        Item Motherboard = boughtItems.stream()
+//                                .filter(component -> "Motherboard".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (Motherboard == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(Motherboard);
+//
+//                        Item Mouse = boughtItems.stream()
+//                                .filter(component -> "Mouse".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (Mouse == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(Mouse);
+//
+//                        Item SSD = boughtItems.stream()
+//                                .filter(component -> "SSD".equals(component.Description))
+//                                .findFirst()
+//                                .orElse(null);
+//                        if (SSD == null) {
+//                            break;
+//                        }
+//                        boughtItems.remove(SSD);
+//
+//                        builtComputers.add(new Computer(CPU, Keyboard, Case, MemoryModule, Monitor, Motherboard, Mouse, SSD));
+//                    }
+
+                    if (builtComputers > 0) {
+                        System.out.println("Bidder " + getAID().getName() + " purchased enough components to build " + builtComputers + " computers at a price of " + totalSpent / builtComputers + " per computer, spending a total of: " + totalSpent);
+
+                    }
+                    else {
+                        System.out.println("Bidder " + getAID().getName() + " purchased could not purchase enough components to build a single computer despite spending a total of: " + totalSpent + ". Honestly mood");
+                    }
+
 
 // Printout a dismissal message
-                    System.out.println("Bidder " + getAID().getName() + "terminating.");
+//                    System.out.println("Bidder " + getAID().getName() + "terminating.");
 
                     // Make the agent terminate immediately
                     doDelete();
@@ -197,6 +336,16 @@ public class BidderAgent extends Agent
                 }
 
             }
+        }
+
+        private void recordWinningBid(ACLMessage msg)
+        {
+            System.out.println("Bidding won by: " + myAgent.getLocalName());
+            var itemDescription = msg.getContent().split(",")[0];
+            var itemPrice = Integer.parseInt(msg.getContent().split(",")[1]);
+
+            //add item to bought items, cba fucking about w the extra starting price
+            boughtItems.add(new Item(itemDescription, itemPrice, itemPrice));
         }
     }
 }

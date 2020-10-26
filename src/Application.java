@@ -3,6 +3,7 @@ import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.core.Runtime;
+import jade.wrapper.StaleProxyException;
 
 import java.util.Hashtable;
 
@@ -33,15 +34,10 @@ public class Application
             AgentController auctioneerAgent = myContainer.createNewAgent("auctioneer", AuctioneerAgent.class.getCanonicalName(), new Hashtable[]{catalogue});
             auctioneerAgent.start();
 
-            for (int i = 0; i < 5; i++) {
+            var biddersToGenerate=3;
+            generateBiddersWithRandomisedShoppingLists(myContainer,biddersToGenerate);
 
-                var shoppingListCsvPath = "shoppingList" + i + ".csv";
-
-                var shoppingList = CsvParsers.ParseShoppingListCsv(shoppingListCsvPath);
-
-                AgentController bidderAgent = myContainer.createNewAgent("bidder" + i, BidderAgent.class.getCanonicalName(), new Hashtable[]{shoppingList});
-                bidderAgent.start();
-            }
+//            generateBiddersWithCsvShoppingLists(myContainer);
 
 
         } catch (Exception e) {
@@ -51,5 +47,30 @@ public class Application
 
         }
 
+    }
+
+    private static void generateBiddersWithRandomisedShoppingLists(ContainerController myContainer,int biddersToGenerate) throws StaleProxyException
+    {
+        for (int i = 0; i < biddersToGenerate; i++) {
+
+
+            var shoppingList = CsvParsers.GenerateShoppingList();
+
+            AgentController bidderAgent = myContainer.createNewAgent("bidder" + i, BidderAgent.class.getCanonicalName(), new Hashtable[]{shoppingList});
+            bidderAgent.start();
+        }
+    }
+
+    private static void generateBiddersWithCsvShoppingLists(ContainerController myContainer) throws StaleProxyException
+    {
+        for (int i = 0; i < 5; i++) {
+
+            var shoppingListCsvPath = "pcBuilderShoppingList" + i + ".csv";
+
+            var shoppingList = CsvParsers.ParseShoppingListCsv(shoppingListCsvPath);
+
+            AgentController bidderAgent = myContainer.createNewAgent("bidder" + i, BidderAgent.class.getCanonicalName(), new Hashtable[]{shoppingList});
+            bidderAgent.start();
+        }
     }
 }

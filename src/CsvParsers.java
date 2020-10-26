@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 public class CsvParsers
@@ -44,7 +46,10 @@ public class CsvParsers
             while ((row = csvReader.readLine()) != null) {
 
                 String[] data = row.split(",");
-                shoppingList.put(data[0], Integer.parseInt(data[1]));
+//                shoppingList.put(data[0], Integer.parseInt(data[1]));
+                //my own generated data is shit so i'm setting maxes randomly
+                shoppingList.put(data[0], (int) (Math.random() * (300 - 70) + 70));
+
             }
             csvReader.close();
 
@@ -53,6 +58,22 @@ public class CsvParsers
             e.printStackTrace();
 
         }
+        return shoppingList;
+    }
+
+    static Hashtable<String, Integer> GenerateShoppingList()
+    {
+
+        var shoppingList = new Hashtable<String, Integer>();
+        var itemTypeList = new ArrayList<>(Arrays.asList("CPU",
+                "Keyboard",
+                "Memory Module", "Monitor", "Motherboard", "Mouse", "SSD", "Case"));
+
+
+        for (String itemType : itemTypeList) {
+            shoppingList.put(itemType, (int) (Math.random() * (300 - 120) + 120));
+        }
+
         return shoppingList;
     }
 
